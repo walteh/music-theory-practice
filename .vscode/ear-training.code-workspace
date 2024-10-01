@@ -1,0 +1,31 @@
+{
+	"folders": [
+		{
+			"name": "root",
+			"path": "../",
+		},
+	],
+	"settings": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "vscode.html-language-features",
+		"editor.formatOnSaveMode": "file",
+		"html.format.enable": true,
+		"eslint.enable": false,
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "always",
+			"source.fixAll": "always",
+		},
+		"files.associations": {
+			"tsconfig.*json": "jsonc",
+			"*.css": "tailwindcss",
+		},
+		"explorer.sortOrder": "type",
+		"explorer.sortOrderLexicographicOptions": "upper",
+		"[dotenv]": {
+			"editor.defaultFormatter": "foxundermoon.shell-format",
+		},
+		"gitlens.codeLens.enabled": false,
+		"workbench.tree.indent": 16,
+		"svg.preview.background": "transparent",
+	},
+}

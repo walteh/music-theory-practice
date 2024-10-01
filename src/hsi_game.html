@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>HSI Practice Game</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<style>
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.1);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+			.pulse {
+				animation: pulse 0.5s;
+			}
+		</style>
+	</head>
+	<body class="bg-gray-100 min-h-screen">
+		<nav class="bg-blue-600 text-white p-4">
+			<div class="container mx-auto flex justify-between items-center">
+				<a href="home.html" class="text-2xl font-bold"
+					>Music Theory Practice - by walteh</a
+				>
+				<div>
+					<a href="home.html" class="mx-2 hover:underline">Home</a>
+					<a
+						href="https://github.com/walteh/music-theory-practice"
+						class="hover:underline"
+						>Source Code</a
+					>
+				</div>
+			</div>
+		</nav>
+
+		<div class="container mx-auto px-4 py-8">
+			<h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
+				HSI Tracking Game
+			</h1>
+			<div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+				<div
+					class="sticky top-0 bg-white z-10 border-b border-gray-200"
+				>
+					<div class="flex justify-between p-4">
+						<button
+							id="practiceTab"
+							class="bg-blue-500 text-white px-6 py-2 rounded-full shadow-md hover:bg-blue-600 transition duration-300"
+						>
+							Practice
+						</button>
+						<button
+							id="settingsTab"
+							class="bg-gray-300 text-gray-700 px-6 py-2 rounded-full shadow-md hover:bg-gray-400 transition duration-300"
+						>
+							Settings
+						</button>
+						<button
+							id="historyTab"
+							class="bg-gray-300 text-gray-700 px-6 py-2 rounded-full shadow-md hover:bg-gray-400 transition duration-300"
+						>
+							History
+						</button>
+					</div>
+				</div>
+				<div class="p-6">
+					<div id="practiceSection">
+						<button
+							id="generate"
+							class="w-full bg-blue-500 text-white p-3 rounded-full shadow-md hover:bg-blue-600 transition duration-300 mb-6"
+						>
+							Generate HSIs
+						</button>
+						<div
+							id="timer"
+							class="text-xl font-bold text-center mb-2 hidden text-gray-700"
+						>
+							Total Time: 0s
+						</div>
+						<div
+							id="intervalTimer"
+							class="text-lg text-center mb-4 hidden text-gray-600"
+						>
+							Interval Time: 0s
+						</div>
+						<div
+							id="hsiDisplay"
+							class="text-lg font-bold text-center mb-6 text-gray-700"
+						></div>
+						<div
+							id="startNote"
+							class="text-2xl font-bold text-center mb-4 text-blue-600"
+						></div>
+						<div
+							id="currentHSI"
+							class="text-6xl font-bold text-center mb-6 text-purple-600"
+						></div>
+						<div
+							id="endNote"
+							class="text-2xl font-bold text-center mb-4 text-red-600 hidden"
+						></div>
+						<div
+							id="pathFollowed"
+							class="text-md text-center mb-6 hidden bg-gray-100 p-4 rounded-lg"
+						></div>
+						<button
+							id="next"
+							class="w-full bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition duration-300 mb-6 hidden"
+							disabled
+						>
+							Next
+						</button>
+						<div
+							id="progress"
+							class="text-center mb-6 text-gray-700"
+						></div>
+						<div id="resultInput" class="mb-6 hidden">
+							<label
+								for="mistakes"
+								class="block mb-2 text-gray-700"
+								>Number of mistakes:</label
+							>
+							<select
+								id="mistakes"
+								class="w-full p-3 border rounded-lg shadow-sm"
+							>
+								<option value="0">0 (Perfect)</option>
+								<option value="1">1</option>
+								<option value="2">More than 1</option>
+							</select>
+							<button
+								id="saveResult"
+								class="w-full bg-purple-500 text-white p-3 rounded-full shadow-md hover:bg-purple-600 transition duration-300 mt-4"
+							>
+								Save Result
+							</button>
+						</div>
+					</div>
+
+					<div id="settingsSection" class="hidden">
+						<h2
+							class="text-2xl font-bold mb-6 text-center text-gray-800"
+						>
+							Settings
+						</h2>
+						<div class="mb-6">
+							<label for="range" class="block mb-2 text-gray-700"
+								>HSI Range:</label
+							>
+							<input
+								type="number"
+								id="range"
+								min="1"
+								max="11"
+								value="5"
+								class="w-full p-3 border rounded-lg shadow-sm"
+							/>
+						</div>
+						<div class="mb-6">
+							<label for="count" class="block mb-2 text-gray-700"
+								>Number of HSIs:</label
+							>
+							<input
+								type="number"
+								id="count"
+								min="1"
+								max="20"
+								value="5"
+								class="w-full p-3 border rounded-lg shadow-sm"
+							/>
+						</div>
+						<div class="mb-6 flex items-center">
+							<label for="useSolfege" class="mr-4 text-gray-700"
+								>Use Solfège:</label
+							>
+							<input
+								type="checkbox"
+								id="useSolfege"
+								class="form-checkbox h-6 w-6 text-blue-600 rounded"
+								checked
+							/>
+						</div>
+						<div class="mb-6 flex items-center">
+							<label for="useSharp" class="mr-4 text-gray-700"
+								>Use Sharps (♯):</label
+							>
+							<input
+								type="checkbox"
+								id="useSharp"
+								class="form-checkbox h-6 w-6 text-blue-600 rounded"
+								checked
+							/>
+						</div>
+						<div class="mb-6 flex items-center">
+							<label for="hideTimer" class="mr-4 text-gray-700"
+								>Hide Timer:</label
+							>
+							<input
+								type="checkbox"
+								id="hideTimer"
+								class="form-checkbox h-6 w-6 text-blue-600 rounded"
+							/>
+						</div>
+						<div class="mb-6 flex items-center">
+							<label
+								for="hideOtherHSIs"
+								class="mr-4 text-gray-700"
+								>Hide Other HSIs:</label
+							>
+							<input
+								type="checkbox"
+								id="hideOtherHSIs"
+								class="form-checkbox h-6 w-6 text-blue-600 rounded"
+								checked
+							/>
+						</div>
+					</div>
+
+					<div id="historySection" class="hidden">
+						<h2
+							class="text-2xl font-bold mb-6 text-center text-gray-800"
+						>
+							Practice History
+						</h2>
+						<div class="mb-6">
+							<button
+								id="historyListTab"
+								class="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
+							>
+								History List
+							</button>
+							<button
+								id="progressChartsTab"
+								class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+							>
+								Progress Charts
+							</button>
+						</div>
+						<div id="historyListSection">
+							<div
+								id="historyDisplay"
+								class="text-sm overflow-x-auto"
+							>
+								<table
+									class="min-w-full bg-white border border-gray-300"
+								>
+									<thead>
+										<tr>
+											<th class="py-2 px-4 border-b">
+												Date
+											</th>
+											<th class="py-2 px-4 border-b">
+												HSIs
+											</th>
+											<th class="py-2 px-4 border-b">
+												Range
+											</th>
+											<th class="py-2 px-4 border-b">
+												Total Time
+											</th>
+											<th class="py-2 px-4 border-b">
+												Avg Interval
+											</th>
+											<th class="py-2 px-4 border-b">
+												Mistakes
+											</th>
+										</tr>
+									</thead>
+									<tbody id="historyTableBody"></tbody>
+								</table>
+							</div>
+						</div>
+						<div id="progressChartsSection" class="hidden">
+							<div id="progressCharts" class="mt-8">
+								<h3
+									class="text-xl font-bold mb-4 text-gray-800"
+								>
+									Progress Charts
+								</h3>
+								<canvas id="timeChart" class="mb-8"></canvas>
+								<canvas id="accuracyChart"></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script>
+			const practiceTab = document.getElementById("practiceTab");
+			const settingsTab = document.getElementById("settingsTab");
+			const historyTab = document.getElementById("historyTab");
+			const practiceSection = document.getElementById("practiceSection");
+			const settingsSection = document.getElementById("settingsSection");
+			const historySection = document.getElementById("historySection");
+			const rangeInput = document.getElementById("range");
+			const countInput = document.getElementById("count");
+			const useSolfegeToggle = document.getElementById("useSolfege");
+			const useSharpToggle = document.getElementById("useSharp");
+			const hideTimerToggle = document.getElementById("hideTimer");
+			const hideOtherHSIsToggle =
+				document.getElementById("hideOtherHSIs");
+			const generateBtn = document.getElementById("generate");
+			const timerDisplay = document.getElementById("timer");
+			const intervalTimerDisplay =
+				document.getElementById("intervalTimer");
+			const hsiDisplay = document.getElementById("hsiDisplay");
+			const startNoteDisplay = document.getElementById("startNote");
+			const currentHSI = document.getElementById("currentHSI");
+			const endNoteDisplay = document.getElementById("endNote");
+			const pathFollowedDisplay = document.getElementById("pathFollowed");
+			const nextBtn = document.getElementById("next");
+			const progress = document.getElementById("progress");
+			const resultInput = document.getElementById("resultInput");
+			const mistakesSelect = document.getElementById("mistakes");
+			const saveResultBtn = document.getElementById("saveResult");
+			const historyDisplay = document.getElementById("historyDisplay");
+
+			const notesSharp = [
+				"C",
+				"C♯",
+				"D",
+				"D♯",
+				"E",
+				"F",
+				"F♯",
+				"G",
+				"G♯",
+				"A",
+				"A♯",
+				"B",
+			];
+			const notesFlat = [
+				"C",
+				"D♭",
+				"D",
+				"E♭",
+				"E",
+				"F",
+				"G♭",
+				"G",
+				"A♭",
+				"A",
+				"B♭",
+				"B",
+			];
+			const solfegeSharp = [
+				"Do",
+				"Do♯",
+				"Re",
+				"Re♯",
+				"Mi",
+				"Fa",
+				"Fa♯",
+				"Sol",
+				"Sol♯",
+				"La",
+				"La♯",
+				"Si",
+			];
+			const solfegeFlat = [
+				"Do",
+				"Re♭",
+				"Re",
+				"Mi♭",
+				"Mi",
+				"Fa",
+				"Sol♭",
+				"Sol",
+				"La♭",
+				"La",
+				"Si♭",
+				"Si",
+			];
+
+			let hsiList = [];
+			let currentIndex = 0;
+			let startNote, endNote;
+			let path = [];
+			let startTime,
+				intervalStartTime,
+				timerInterval,
+				intervalTimerInterval;
+			let intervalTimes = [];
+
+			function showTab(tabName) {
+				[practiceSection, settingsSection, historySection].forEach(
+					(section) => section.classList.add("hidden")
+				);
+				[practiceTab, settingsTab, historyTab].forEach((tab) => {
+					tab.classList.remove("bg-blue-500", "text-white");
+					tab.classList.add("bg-gray-300", "text-gray-700");
+				});
+
+				document
+					.getElementById(`${tabName}Section`)
+					.classList.remove("hidden");
+				document
+					.getElementById(`${tabName}Tab`)
+					.classList.add("bg-blue-500", "text-white");
+				document
+					.getElementById(`${tabName}Tab`)
+					.classList.remove("bg-gray-300", "text-gray-700");
+
+				if (tabName === "history") {
+					updateHistoryDisplay();
+					updateProgressCharts();
+				}
+			}
+
+			practiceTab.addEventListener("click", () => showTab("practice"));
+			settingsTab.addEventListener("click", () => showTab("settings"));
+			historyTab.addEventListener("click", () => showTab("history"));
+
+			generateBtn.addEventListener("click", generateSequence);
+			nextBtn.addEventListener("click", nextHSI);
+			saveResultBtn.addEventListener("click", saveResult);
+			hideTimerToggle.addEventListener("change", updateTimerVisibility);
+			hideOtherHSIsToggle.addEventListener("change", updateHSIVisibility);
+
+			function generateSequence() {
+				const range = parseInt(rangeInput.value);
+				const count = parseInt(countInput.value);
+				hsiList = generateHSIs(range, count);
+				const notes = getNotesArray();
+				startNote = notes[Math.floor(Math.random() * notes.length)];
+				[endNote, path] = calculateEndNoteAndPath(startNote, hsiList);
+				updateHSIDisplay();
+				startNoteDisplay.textContent = `Start: ${startNote}`;
+				endNoteDisplay.textContent = `End: ${endNote}`;
+				endNoteDisplay.classList.add("hidden");
+				pathFollowedDisplay.classList.add("hidden");
+				resultInput.classList.add("hidden");
+				currentIndex = 0;
+				intervalTimes = [];
+				updateDisplay();
+				nextBtn.disabled = false;
+				nextBtn.classList.remove("hidden");
+				startTimer();
+				startIntervalTimer();
+				updateTimerVisibility();
+				saveSettings();
+			}
+
+			function nextHSI() {
+				intervalTimes.push(
+					parseFloat(intervalTimerDisplay.textContent.split(": ")[1])
+				);
+				startIntervalTimer();
+				currentIndex++;
+				updateDisplay();
+				currentHSI.classList.add("pulse");
+				setTimeout(() => currentHSI.classList.remove("pulse"), 500);
+			}
+
+			function calculateEndNoteAndPath(start, hsis) {
+				const notes = getNotesArray();
+				let index = notes.indexOf(start);
+				const path = [{ note: start, hsi: 0 }];
+				hsis.forEach((hsi) => {
+					index = (index + hsi + 12) % 12;
+					path.push({ note: notes[index], hsi: hsi });
+				});
+				return [notes[index], path];
+			}
+
+			function updateDisplay() {
+				if (currentIndex < hsiList.length) {
+					currentHSI.textContent = hsiList[currentIndex];
+					progress.textContent = `${currentIndex + 1} / ${
+						hsiList.length
+					}`;
+				} else {
+					currentHSI.textContent = "Done!";
+					nextBtn.disabled = true;
+					nextBtn.classList.add("hidden");
+					progress.textContent = `${hsiList.length} / ${hsiList.length}`;
+					showResult();
+				}
+			}
+
+			function showResult() {
+				endNoteDisplay.classList.remove("hidden");
+				endNoteDisplay.innerHTML = `End: <span class="text-4xl font-bold text-red-600">${endNote}</span>`;
+				pathFollowedDisplay.innerHTML = `Path: ${path
+					.map(
+						(step, index) =>
+							`<span class="inline-block px-2 py-1 m-1 bg-gray-200 rounded-full">${
+								step.note
+							}${
+								index > 0
+									? ` <span class="text-sm text-gray-600">(${
+											step.hsi > 0 ? "+" : ""
+									  }${step.hsi})</span>`
+									: ""
+							}</span>`
+					)
+					.join(" → ")}`;
+				pathFollowedDisplay.classList.remove("hidden");
+				stopTimer();
+				stopIntervalTimer();
+				resultInput.classList.remove("hidden");
+			}
+
+			function saveSettings() {
+				const settings = {
+					range: rangeInput.value,
+					count: countInput.value,
+					useSolfege: useSolfegeToggle.checked,
+					useSharp: useSharpToggle.checked,
+					hideTimer: hideTimerToggle.checked,
+					hideOtherHSIs: hideOtherHSIsToggle.checked,
+				};
+				localStorage.setItem("hsiSettings", JSON.stringify(settings));
+			}
+
+			function loadSettings() {
+				const settings = JSON.parse(
+					localStorage.getItem("hsiSettings")
+				);
+				if (settings) {
+					rangeInput.value = settings.range;
+					countInput.value = settings.count;
+					useSolfegeToggle.checked = settings.useSolfege;
+					useSharpToggle.checked = settings.useSharp;
+					hideTimerToggle.checked = settings.hideTimer;
+					hideOtherHSIsToggle.checked = settings.hideOtherHSIs;
+					updateTimerVisibility();
+					updateHSIVisibility();
+				}
+			}
+
+			// Event listeners for settings changes
+			[
+				rangeInput,
+				countInput,
+				useSolfegeToggle,
+				useSharpToggle,
+				hideTimerToggle,
+				hideOtherHSIsToggle,
+			].forEach((element) => {
+				element.addEventListener("change", saveSettings);
+			});
+
+			function generateHSIs(range, count) {
+				return Array.from({ length: count }, () => {
+					let hsi;
+					do {
+						hsi =
+							Math.floor(Math.random() * (range * 2 + 1)) - range;
+					} while (hsi === 0);
+					return hsi;
+				});
+			}
+
+			function getNotesArray() {
+				if (useSolfegeToggle.checked) {
+					return useSharpToggle.checked ? solfegeSharp : solfegeFlat;
+				} else {
+					return useSharpToggle.checked ? notesSharp : notesFlat;
+				}
+			}
+
+			function startTimer() {
+				startTime = Date.now();
+				timerInterval = setInterval(updateTimer, 100);
+			}
+
+			function stopTimer() {
+				clearInterval(timerInterval);
+			}
+
+			function updateTimer() {
+				const elapsedTime = (Date.now() - startTime) / 1000;
+				timerDisplay.textContent = `Total Time: ${elapsedTime.toFixed(
+					1
+				)}s`;
+			}
+
+			function startIntervalTimer() {
+				intervalStartTime = Date.now();
+				clearInterval(intervalTimerInterval);
+				intervalTimerInterval = setInterval(updateIntervalTimer, 100);
+			}
+
+			function stopIntervalTimer() {
+				clearInterval(intervalTimerInterval);
+			}
+
+			function updateIntervalTimer() {
+				const elapsedTime = (Date.now() - intervalStartTime) / 1000;
+				intervalTimerDisplay.textContent = `Interval Time: ${elapsedTime.toFixed(
+					1
+				)}s`;
+			}
+
+			function saveResult() {
+				const mistakes = parseInt(mistakesSelect.value);
+				const totalTime = parseFloat(
+					timerDisplay.textContent.split(": ")[1]
+				);
+				const result = {
+					date: new Date().toLocaleString(),
+					hsiCount: hsiList.length,
+					hsiRange: parseInt(rangeInput.value),
+					totalTime: totalTime,
+					intervalTimes: intervalTimes,
+					mistakes: mistakes,
+				};
+
+				let history =
+					JSON.parse(localStorage.getItem("hsiHistory")) || [];
+				history.unshift(result);
+				if (history.length > 50) history.pop();
+				localStorage.setItem("hsiHistory", JSON.stringify(history));
+
+				updateHistoryDisplay();
+				resultInput.classList.add("hidden");
+			}
+
+			function updateHistoryDisplay() {
+				const history =
+					JSON.parse(localStorage.getItem("hsiHistory")) || [];
+				historyDisplay.innerHTML =
+					'<h3 class="font-bold mb-2">History (Last 50 attempts):</h3>';
+				history.forEach((result, index) => {
+					const mistakesText =
+						result.mistakes === 0
+							? "Perfect"
+							: result.mistakes === 1
+							? "1 mistake"
+							: "More than 1 mistake";
+					const avgIntervalTime =
+						result.intervalTimes.reduce((a, b) => a + b, 0) /
+						result.intervalTimes.length;
+					historyDisplay.innerHTML += `
+                    <div class="mb-2">
+                        <strong>${index + 1}.</strong> ${result.date}<br>
+                        HSIs: ${result.hsiCount}, Range: ${
+						result.hsiRange
+					}, Total Time: ${result.totalTime.toFixed(1)}s<br>
+                        Avg Interval: ${avgIntervalTime.toFixed(
+							1
+						)}s, ${mistakesText}
+                    </div>
+`;
+				});
+			}
+
+			function updateHSIDisplay() {
+				if (hideOtherHSIsToggle.checked) {
+					hsiDisplay.classList.add("hidden");
+				} else {
+					hsiDisplay.classList.remove("hidden");
+					hsiDisplay.textContent = `HSIs: [${hsiList.join(", ")}]`;
+				}
+			}
+
+			function updateTimerVisibility() {
+				if (hideTimerToggle.checked) {
+					timerDisplay.classList.add("hidden");
+					intervalTimerDisplay.classList.add("hidden");
+				} else {
+					timerDisplay.classList.remove("hidden");
+					intervalTimerDisplay.classList.remove("hidden");
+				}
+			}
+
+			function updateHSIVisibility() {
+				updateHSIDisplay();
+			}
+
+			function updateProgressCharts() {
+				const history =
+					JSON.parse(localStorage.getItem("hsiHistory")) || [];
+				const labels = history
+					.map((_, index) => `Attempt ${history.length - index}`)
+					.reverse();
+				const totalTimes = history
+					.map((result) => result.totalTime)
+					.reverse();
+				const avgIntervalTimes = history
+					.map(
+						(result) =>
+							result.intervalTimes.reduce((a, b) => a + b, 0) /
+							result.intervalTimes.length
+					)
+					.reverse();
+				const mistakes = history
+					.map((result) => result.mistakes)
+					.reverse();
+
+				// Time Chart
+				new Chart(document.getElementById("timeChart"), {
+					type: "line",
+					data: {
+						labels: labels,
+						datasets: [
+							{
+								label: "Total Time",
+								data: totalTimes,
+								borderColor: "rgb(75, 192, 192)",
+								tension: 0.1,
+							},
+							{
+								label: "Avg Interval Time",
+								data: avgIntervalTimes,
+								borderColor: "rgb(255, 99, 132)",
+								tension: 0.1,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						scales: {
+							y: {
+								beginAtZero: true,
+								title: {
+									display: true,
+									text: "Time (seconds)",
+								},
+							},
+						},
+					},
+				});
+
+				// Accuracy Chart
+				new Chart(document.getElementById("accuracyChart"), {
+					type: "bar",
+					data: {
+						labels: labels,
+						datasets: [
+							{
+								label: "Mistakes",
+								data: mistakes,
+								backgroundColor: "rgba(255, 99, 132, 0.5)",
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						scales: {
+							y: {
+								beginAtZero: true,
+								max: 2,
+								ticks: {
+									stepSize: 1,
+									callback: function (value) {
+										if (value === 0) return "Perfect";
+										if (value === 1) return "1 mistake";
+										if (value === 2) return "2+ mistakes";
+									},
+								},
+								title: {
+									display: true,
+									text: "Accuracy",
+								},
+							},
+						},
+					},
+				});
+			}
+
+			const historyListTab = document.getElementById("historyListTab");
+			const progressChartsTab =
+				document.getElementById("progressChartsTab");
+			const historyListSection =
+				document.getElementById("historyListSection");
+			const progressChartsSection = document.getElementById(
+				"progressChartsSection"
+			);
+
+			historyListTab.addEventListener("click", () =>
+				showHistoryTab("list")
+			);
+			progressChartsTab.addEventListener("click", () =>
+				showHistoryTab("charts")
+			);
+
+			function showHistoryTab(tab) {
+				if (tab === "list") {
+					historyListSection.classList.remove("hidden");
+					progressChartsSection.classList.add("hidden");
+					historyListTab.classList.remove(
+						"bg-gray-300",
+						"text-gray-700"
+					);
+					historyListTab.classList.add("bg-blue-500", "text-white");
+					progressChartsTab.classList.remove(
+						"bg-blue-500",
+						"text-white"
+					);
+					progressChartsTab.classList.add(
+						"bg-gray-300",
+						"text-gray-700"
+					);
+				} else {
+					historyListSection.classList.add("hidden");
+					progressChartsSection.classList.remove("hidden");
+					historyListTab.classList.add(
+						"bg-gray-300",
+						"text-gray-700"
+					);
+					historyListTab.classList.remove(
+						"bg-blue-500",
+						"text-white"
+					);
+					progressChartsTab.classList.add(
+						"bg-blue-500",
+						"text-white"
+					);
+					progressChartsTab.classList.remove(
+						"bg-gray-300",
+						"text-gray-700"
+					);
+				}
+			}
+
+			function updateHistoryDisplay() {
+				const history =
+					JSON.parse(localStorage.getItem("hsiHistory")) || [];
+				const tableBody = document.getElementById("historyTableBody");
+				tableBody.innerHTML = "";
+				history.forEach((result, index) => {
+					const mistakesText =
+						result.mistakes === 0
+							? "Perfect"
+							: result.mistakes === 1
+							? "1 mistake"
+							: "More than 1 mistake";
+					const avgIntervalTime =
+						result.intervalTimes.reduce((a, b) => a + b, 0) /
+						result.intervalTimes.length;
+					const row = tableBody.insertRow();
+					row.innerHTML = `
+        <td class="py-2 px-4 border-b">${result.date}</td>
+        <td class="py-2 px-4 border-b">${result.hsiCount}</td>
+        <td class="py-2 px-4 border-b">${result.hsiRange}</td>
+        <td class="py-2 px-4 border-b">${result.totalTime.toFixed(1)}s</td>
+        <td class="py-2 px-4 border-b">${avgIntervalTime.toFixed(1)}s</td>
+        <td class="py-2 px-4 border-b">${mistakesText}</td>
+    `;
+				});
+			}
+
+			// Initialize the app
+			showTab("practice");
+			updateTimerVisibility();
+			loadSettings();
+			updateHSIVisibility();
+		</script>
+	</body>
+</html>
