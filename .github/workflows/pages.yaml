@@ -35,7 +35,7 @@ jobs:
               uses: actions/configure-pages@v5
             - name: build
               run: |
-                  echo "music-theory.walteh.com" > dist/CNAME
+                  echo "music-theory.walteh.com" > src/CNAME
             - name: upload artifact
               uses: actions/upload-pages-artifact@v3
               with:
