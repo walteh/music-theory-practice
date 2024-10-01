@@ -32,13 +32,9 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
             - name: setup bun
-              uses: oven-sh/setup-bun@v2
-            - name: setup pages
               uses: actions/configure-pages@v5
             - name: build
               run: |
-                  bun install
-                  bun run build
                   echo "music-theory.walteh.com" > dist/CNAME
             - name: upload artifact
               uses: actions/upload-pages-artifact@v3
