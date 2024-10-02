@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>HSI Tracking Trainer with Corrected HSI Calculation</title>
+		<script src="https://cdn.jsdelivr.net/npm/vexflow@4.0.3/build/cjs/vexflow.min.js"></script>
+		<script src="https://cdn.tailwindcss.com"></script>
+	</head>
+	<body class="bg-gray-100 min-h-screen">
+		<nav class="bg-blue-600 text-white p-4">
+			<div class="container mx-auto flex justify-between items-center">
+				<a href="index.html" class="text-2xl font-bold"
+					>Music Theory Practice - by walteh</a
+				>
+				<div>
+					<a href="index.html" class="mx-2 hover:underline">Home</a>
+					<a
+						href="https://github.com/walteh/music-theory-practice"
+						class="hover:underline"
+						>Source Code</a
+					>
+				</div>
+			</div>
+		</nav>
+
+		<div class="container mx-auto px-4 py-8">
+			<h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
+				Sight Reading Trainer
+			</h1>
+			<div id="notationContainer" class="w-full h-80 mb-4"></div>
+			<div class="flex justify-between mb-4">
+				<button
+					id="prevNote"
+					class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+				>
+					Previous Note
+				</button>
+				<button
+					id="nextNote"
+					class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+				>
+					Next Note
+				</button>
+			</div>
+			<div class="mb-4">
+				<label for="exerciseType" class="block mb-2"
+					>Exercise Type:</label
+				>
+				<select id="exerciseType" class="border rounded p-2">
+					<option value="verticalHSI">Vertical HSI Tracking</option>
+					<option value="horizontalHSI">
+						Horizontal HSI Tracking
+					</option>
+					<option value="fullTracking">Full Tracking Protocol</option>
+				</select>
+			</div>
+			<div class="mb-4">
+				<label for="startingNote" class="block mb-2"
+					>Starting Note:</label
+				>
+				<select id="startingNote" class="border rounded p-2">
+					<option value="C/4">Do (C4)</option>
+					<option value="D/4">Re (D4)</option>
+					<option value="E/4">Mi (E4)</option>
+					<option value="F/4">Fa (F4)</option>
+					<option value="G/4">Sol (G4)</option>
+					<option value="A/4">La (A4)</option>
+					<option value="B/4">Si/Ti (B4)</option>
+				</select>
+			</div>
+			<div class="mb-4">
+				<label for="trackingLine" class="block mb-2"
+					>Tracking Line:</label
+				>
+				<select id="trackingLine" class="border rounded p-2">
+					<option value="seconds">Seconds</option>
+					<option value="thirds">Thirds</option>
+					<option value="fourths">Fourths</option>
+					<option value="fifths">Fifths</option>
+					<option value="sixths">Sixths</option>
+					<option value="sevenths">Sevenths</option>
+				</select>
+			</div>
+			<button
+				id="generateSequence"
+				class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+			>
+				Generate Sequence
+			</button>
+			<div id="exerciseInfo" class="mt-4 p-4 bg-gray-100 rounded"></div>
+		</div>
+
+		<script>
+			const VF = Vex.Flow;
+			let notesSequence = [];
+			let currentNoteIndex = 0;
+
+			const allNotes = ["C", "D", "E", "F", "G", "A", "B"];
+			const solfege = ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"];
+
+			function generateSequence() {
+				const trackingLine =
+					document.getElementById("trackingLine").value;
+				notesSequence = [];
+
+				let intervals;
+				switch (trackingLine) {
+					case "seconds":
+						intervals = [-1, 1];
+						break;
+					case "thirds":
+						intervals = [-2, -1, 1, 2];
+						break;
+					case "fourths":
+						intervals = [-3, -2, -1, 1, 2, 3];
+						break;
+					case "fifths":
+						intervals = [-4, -3, -2, -1, 1, 2, 3, 4];
+						break;
+					case "sixths":
+						intervals = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5];
+						break;
+					case "sevenths":
+						intervals = [-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6];
+						break;
+				}
+
+				let currentIndex = 6; // B
+				let currentOctave = 4; // Starting octave
+				notesSequence.push("B/4");
+
+				for (let i = 1; i < 16; i++) {
+					let intervalChange =
+						intervals[Math.floor(Math.random() * intervals.length)];
+					let newIndex = (currentIndex + intervalChange + 7) % 7;
+					let newOctave =
+						currentOctave +
+						Math.floor((currentIndex + intervalChange) / 7);
+
+					// Ensure the note is within a reasonable range (C4 to B5)
+					if (newOctave < 4) newOctave = 4;
+					if (newOctave > 5) newOctave = 5;
+
+					currentIndex = newIndex;
+					currentOctave = newOctave;
+					notesSequence.push(
+						allNotes[currentIndex] + "/" + currentOctave
+					);
+				}
+
+				currentNoteIndex = 0;
+				renderNotation();
+				updateExerciseInfo();
+			}
+			function renderNotation() {
+				const container = document.getElementById("notationContainer");
+				container.innerHTML = "";
+
+				const renderer = new VF.Renderer(
+					container,
+					VF.Renderer.Backends.SVG
+				);
+				renderer.resize(container.clientWidth, container.clientHeight);
+				const context = renderer.getContext();
+
+				const stave = new VF.Stave(10, 40, container.clientWidth - 20);
+				stave.addClef("treble").setContext(context).draw();
+
+				const notes = notesSequence.map((note, index) => {
+					const [pitch, octave] = note.split("/");
+					const staveNote = new VF.StaveNote({
+						clef: "treble",
+						keys: [note],
+						duration: "w",
+					});
+
+					// Adjust the stem direction based on the note's position
+					if (octave >= 4 || (octave == 3 && ["B"].includes(pitch))) {
+						staveNote.setStemDirection(-1);
+					} else {
+						staveNote.setStemDirection(1);
+					}
+
+					if (
+						index === currentNoteIndex ||
+						index === currentNoteIndex + 1
+					) {
+						staveNote.setStyle({
+							fillStyle: "red",
+							strokeStyle: "red",
+						});
+					}
+
+					return staveNote;
+				});
+
+				const voice = new VF.Voice({
+					num_beats: notes.length * 4,
+					beat_value: 4,
+				});
+				voice.addTickables(notes);
+
+				const formatter = new VF.Formatter()
+					.joinVoices([voice])
+					.format([voice], container.clientWidth - 50);
+
+				voice.draw(context, stave);
+			}
+			function updateNote(direction) {
+				currentNoteIndex += direction;
+				if (currentNoteIndex < 0) currentNoteIndex = 0;
+				if (currentNoteIndex >= notesSequence.length - 1)
+					currentNoteIndex = notesSequence.length - 2;
+				renderNotation();
+				updateExerciseInfo();
+			}
+
+			function calculateHSI(note1, note2) {
+				const noteValues = {
+					C: 0,
+					D: 2,
+					E: 4,
+					F: 5,
+					G: 7,
+					A: 9,
+					B: 11,
+				};
+				const [pitch1, octave1] = note1.split("/");
+				const [pitch2, octave2] = note2.split("/");
+
+				let semitones =
+					(noteValues[pitch2] -
+						noteValues[pitch1] +
+						(parseInt(octave2) - parseInt(octave1)) * 12 +
+						12) %
+					12;
+				return semitones;
+			}
+			function calculateRelativeInterval(note1, note2) {
+				const [pitch1, octave1] = note1.split("/");
+				const [pitch2, octave2] = note2.split("/");
+				let interval =
+					(allNotes.indexOf(pitch2) -
+						allNotes.indexOf(pitch1) +
+						(parseInt(octave2) - parseInt(octave1)) * 7) %
+					7;
+				if (interval > 3) interval -= 7;
+				if (interval < -3) interval += 7;
+				return interval;
+			}
+
+			function updateExerciseInfo() {
+				const exerciseInfo = document.getElementById("exerciseInfo");
+				const startingNote =
+					document.getElementById("startingNote").value;
+				const [startPitch, startOctave] = startingNote.split("/");
+				const startIndex = allNotes.indexOf(startPitch);
+
+				if (currentNoteIndex >= notesSequence.length - 1) {
+					exerciseInfo.innerHTML = "End of sequence reached.";
+					return;
+				}
+
+				function adjustNote(note) {
+					const [pitch, octave] = note.split("/");
+					const pitchIndex = allNotes.indexOf(pitch);
+					let relativePitch = (pitchIndex - 6 + startIndex + 7) % 7;
+					let relativeOctave =
+						parseInt(octave) - 4 + parseInt(startOctave);
+					if (relativePitch < startIndex) relativeOctave++;
+					return allNotes[relativePitch] + "/" + relativeOctave;
+				}
+
+				const startNote = adjustNote(notesSequence[currentNoteIndex]);
+				const endNote = adjustNote(notesSequence[currentNoteIndex + 1]);
+
+				const verticalHSIStart = calculateHSI(startingNote, startNote);
+				const verticalHSIEnd = calculateHSI(startingNote, endNote);
+				const horizontalHSI = calculateHSI(startNote, endNote);
+				const relativeInterval = calculateRelativeInterval(
+					startNote,
+					endNote
+				);
+
+				const startSolfege =
+					solfege[allNotes.indexOf(startNote.split("/")[0])];
+				const endSolfege =
+					solfege[allNotes.indexOf(endNote.split("/")[0])];
+
+				let info = `
+        <strong>Current Interval:</strong><br>
+        Start Note: ${startNote} (${startSolfege})<br>
+        End Note: ${endNote} (${endSolfege})<br>
+        Vertical HSI (Start): ${verticalHSIStart}<br>
+        Vertical HSI (End): ${verticalHSIEnd}<br>
+        Horizontal HSI: ${horizontalHSI}<br>
+        Relative Interval: ${relativeInterval}<br>
+    `;
+
+				exerciseInfo.innerHTML = info;
+			}
+			window.onload = function () {
+				generateSequence();
+				document
+					.getElementById("prevNote")
+					.addEventListener("click", () => updateNote(-1));
+				document
+					.getElementById("nextNote")
+					.addEventListener("click", () => updateNote(1));
+				document
+					.getElementById("generateSequence")
+					.addEventListener("click", generateSequence);
+				document
+					.getElementById("exerciseType")
+					.addEventListener("change", updateExerciseInfo);
+				document
+					.getElementById("startingNote")
+					.addEventListener("change", generateSequence);
+				document
+					.getElementById("trackingLine")
+					.addEventListener("change", generateSequence);
+			};
+		</script>
+	</body>
+</html>
