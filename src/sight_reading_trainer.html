@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>HSI Tracking Trainer with Corrected HSI Calculation</title>
+		<title>HSI Tracking Trainer with Improved UI</title>
 		<script src="https://cdn.jsdelivr.net/npm/vexflow@4.0.3/build/cjs/vexflow.min.js"></script>
 		<script src="https://cdn.tailwindcss.com"></script>
 	</head>
@@ -28,67 +28,156 @@
 			<h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
 				Sight Reading Trainer
 			</h1>
-			<div id="notationContainer" class="w-full h-80 mb-4"></div>
-			<div class="flex justify-between mb-4">
-				<button
-					id="prevNote"
-					class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+			<div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+				<div
+					class="sticky top-0 bg-white z-10 border-b border-gray-200"
 				>
-					Previous Note
-				</button>
-				<button
-					id="nextNote"
-					class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-				>
-					Next Note
-				</button>
+					<div class="flex justify-between p-4">
+						<button
+							id="practiceTab"
+							class="bg-blue-500 text-white px-6 py-2 rounded-full shadow-md hover:bg-blue-600 transition duration-300"
+						>
+							Practice
+						</button>
+						<button
+							id="settingsTab"
+							class="bg-gray-300 text-gray-700 px-6 py-2 rounded-full shadow-md hover:bg-gray-400 transition duration-300"
+						>
+							Settings
+						</button>
+						<button
+							id="historyTab"
+							class="bg-gray-300 text-gray-700 px-6 py-2 rounded-full shadow-md hover:bg-gray-400 transition duration-300"
+						>
+							History
+						</button>
+					</div>
+				</div>
+				<div class="p-6">
+					<div id="practiceSection">
+						<div
+							id="notationContainer"
+							class="w-full h-80 mb-4"
+						></div>
+						<div
+							id="intervalInfo"
+							class="mb-4 flex flex-wrap justify-between text-sm -mt-40 z-10"
+						></div>
+						<div class="flex justify-between mb-4">
+							<button
+								id="prevNote"
+								class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+							>
+								Previous Note
+							</button>
+							<button
+								id="nextNote"
+								class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+							>
+								Next Note
+							</button>
+						</div>
+						<button
+							id="generateSequence"
+							class="w-full bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition duration-300 mt-6"
+						>
+							Generate Sequence
+						</button>
+					</div>
+
+					<div id="settingsSection" class="hidden">
+						<h2
+							class="text-2xl font-bold mb-6 text-center text-gray-800"
+						>
+							Settings
+						</h2>
+						<div class="mb-6">
+							<label
+								for="startingNote"
+								class="block mb-2 text-gray-700"
+								>Starting Note:</label
+							>
+							<select
+								id="startingNote"
+								class="w-full p-3 border rounded-lg shadow-sm"
+							>
+								<option value="C/4">Do (C4)</option>
+								<option value="D/4">Re (D4)</option>
+								<option value="E/4">Mi (E4)</option>
+								<option value="F/4">Fa (F4)</option>
+								<option value="G/4">Sol (G4)</option>
+								<option value="A/4">La (A4)</option>
+								<option value="B/4">Si/Ti (B4)</option>
+							</select>
+						</div>
+						<div class="mb-6">
+							<label
+								for="trackingLine"
+								class="block mb-2 text-gray-700"
+								>Tracking Line:</label
+							>
+							<select
+								id="trackingLine"
+								class="w-full p-3 border rounded-lg shadow-sm"
+							>
+								<option value="seconds">Seconds</option>
+								<option value="thirds">Thirds</option>
+								<option value="fourths">Fourths</option>
+								<option value="fifths">Fifths</option>
+								<option value="sixths">Sixths</option>
+								<option value="sevenths">Sevenths</option>
+							</select>
+						</div>
+						<div class="mb-6">
+							<label
+								for="noteCount"
+								class="block mb-2 text-gray-700"
+								>Number of Notes:</label
+							>
+							<input
+								type="number"
+								id="noteCount"
+								min="2"
+								max="32"
+								value="16"
+								class="w-full p-3 border rounded-lg shadow-sm"
+							/>
+						</div>
+					</div>
+
+					<div id="historySection" class="hidden">
+						<h2
+							class="text-2xl font-bold mb-6 text-center text-gray-800"
+						>
+							Practice History
+						</h2>
+						<div
+							id="historyDisplay"
+							class="text-sm overflow-x-auto"
+						>
+							<table
+								class="min-w-full bg-white border border-gray-300"
+							>
+								<thead>
+									<tr>
+										<th class="py-2 px-4 border-b">Date</th>
+										<th class="py-2 px-4 border-b">
+											Sequence
+										</th>
+										<th class="py-2 px-4 border-b">
+											Tracking Line
+										</th>
+										<th class="py-2 px-4 border-b">
+											Note Count
+										</th>
+									</tr>
+								</thead>
+								<tbody id="historyTableBody"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="mb-4">
-				<label for="exerciseType" class="block mb-2"
-					>Exercise Type:</label
-				>
-				<select id="exerciseType" class="border rounded p-2">
-					<option value="verticalHSI">Vertical HSI Tracking</option>
-					<option value="horizontalHSI">
-						Horizontal HSI Tracking
-					</option>
-					<option value="fullTracking">Full Tracking Protocol</option>
-				</select>
-			</div>
-			<div class="mb-4">
-				<label for="startingNote" class="block mb-2"
-					>Starting Note:</label
-				>
-				<select id="startingNote" class="border rounded p-2">
-					<option value="C/4">Do (C4)</option>
-					<option value="D/4">Re (D4)</option>
-					<option value="E/4">Mi (E4)</option>
-					<option value="F/4">Fa (F4)</option>
-					<option value="G/4">Sol (G4)</option>
-					<option value="A/4">La (A4)</option>
-					<option value="B/4">Si/Ti (B4)</option>
-				</select>
-			</div>
-			<div class="mb-4">
-				<label for="trackingLine" class="block mb-2"
-					>Tracking Line:</label
-				>
-				<select id="trackingLine" class="border rounded p-2">
-					<option value="seconds">Seconds</option>
-					<option value="thirds">Thirds</option>
-					<option value="fourths">Fourths</option>
-					<option value="fifths">Fifths</option>
-					<option value="sixths">Sixths</option>
-					<option value="sevenths">Sevenths</option>
-				</select>
-			</div>
-			<button
-				id="generateSequence"
-				class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-			>
-				Generate Sequence
-			</button>
-			<div id="exerciseInfo" class="mt-4 p-4 bg-gray-100 rounded"></div>
 		</div>
 
 		<script>
@@ -102,6 +191,9 @@
 			function generateSequence() {
 				const trackingLine =
 					document.getElementById("trackingLine").value;
+				const noteCount = parseInt(
+					document.getElementById("noteCount").value
+				);
 				notesSequence = [];
 
 				let intervals;
@@ -130,7 +222,7 @@
 				let currentOctave = 4; // Starting octave
 				notesSequence.push("B/4");
 
-				for (let i = 1; i < 16; i++) {
+				for (let i = 1; i < noteCount; i++) {
 					let intervalChange =
 						intervals[Math.floor(Math.random() * intervals.length)];
 					let newIndex = (currentIndex + intervalChange + 7) % 7;
@@ -152,7 +244,9 @@
 				currentNoteIndex = 0;
 				renderNotation();
 				updateExerciseInfo();
+				saveHistory(notesSequence);
 			}
+
 			function renderNotation() {
 				const container = document.getElementById("notationContainer");
 				container.innerHTML = "";
@@ -175,7 +269,6 @@
 						duration: "w",
 					});
 
-					// Adjust the stem direction based on the note's position
 					if (octave >= 4 || (octave == 3 && ["B"].includes(pitch))) {
 						staveNote.setStemDirection(-1);
 					} else {
@@ -207,6 +300,7 @@
 
 				voice.draw(context, stave);
 			}
+
 			function updateNote(direction) {
 				currentNoteIndex += direction;
 				if (currentNoteIndex < 0) currentNoteIndex = 0;
@@ -237,6 +331,7 @@
 					12;
 				return semitones;
 			}
+
 			function calculateRelativeInterval(note1, note2) {
 				const [pitch1, octave1] = note1.split("/");
 				const [pitch2, octave2] = note2.split("/");
@@ -251,14 +346,14 @@
 			}
 
 			function updateExerciseInfo() {
-				const exerciseInfo = document.getElementById("exerciseInfo");
+				const intervalInfo = document.getElementById("intervalInfo");
 				const startingNote =
 					document.getElementById("startingNote").value;
 				const [startPitch, startOctave] = startingNote.split("/");
 				const startIndex = allNotes.indexOf(startPitch);
 
 				if (currentNoteIndex >= notesSequence.length - 1) {
-					exerciseInfo.innerHTML = "End of sequence reached.";
+					intervalInfo.innerHTML = "End of sequence reached.";
 					return;
 				}
 
@@ -282,45 +377,246 @@
 					startNote,
 					endNote
 				);
+				const whiteKeyInterval = calculateWhiteKeyIntervalString(
+					startNote,
+					endNote
+				);
+
+				const solfeged = true;
 
 				const startSolfege =
 					solfege[allNotes.indexOf(startNote.split("/")[0])];
 				const endSolfege =
 					solfege[allNotes.indexOf(endNote.split("/")[0])];
 
-				let info = `
-        <strong>Current Interval:</strong><br>
-        Start Note: ${startNote} (${startSolfege})<br>
-        End Note: ${endNote} (${endSolfege})<br>
-        Vertical HSI (Start): ${verticalHSIStart}<br>
-        Vertical HSI (End): ${verticalHSIEnd}<br>
-        Horizontal HSI: ${horizontalHSI}<br>
-        Relative Interval: ${relativeInterval}<br>
-    `;
+				const rootStartNote = adjustNote(notesSequence[0]);
+				const rootEndNote = adjustNote(
+					notesSequence[notesSequence.length - 1]
+				);
 
-				exerciseInfo.innerHTML = info;
+				const rootSolfegeStart =
+					solfege[allNotes.indexOf(rootStartNote.split("/")[0])];
+				const rootSolfegeEnd =
+					solfege[allNotes.indexOf(rootEndNote.split("/")[0])];
+
+				const infoItems = [
+					{
+						label: "Start Note",
+						value: solfeged
+							? startSolfege
+							: startNote.split("/")[0],
+					},
+					{
+						label: "End Note",
+						value: solfeged ? endSolfege : endNote.split("/")[0],
+					},
+					{ label: "Vertical HSI (Start)", value: verticalHSIStart },
+					{ label: "Vertical HSI (End)", value: verticalHSIEnd },
+					{ label: "Horizontal HSI", value: horizontalHSI },
+					{ label: "Relative Interval", value: relativeInterval },
+					{
+						label: "White Key Interval",
+						value: whiteKeyInterval.correct,
+					},
+					{
+						label: "Alternate WK Interval",
+						value: whiteKeyInterval.negated,
+					},
+					{
+						label: "Root Start Note",
+						value: solfeged
+							? rootSolfegeStart
+							: rootStartNote.split("/")[0],
+					},
+					{
+						label: "Root End Note",
+						value: solfeged
+							? rootSolfegeEnd
+							: rootEndNote.split("/")[0],
+					},
+				];
+
+				intervalInfo.innerHTML = infoItems
+					.map(
+						(item) => `
+                <div class="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 p-2">
+                    <div class="bg-gray-200 rounded-lg p-2 text-center">
+                        <div class="font-semibold">${item.label}</div>
+                        <div class="mt-1">${item.value}</div>
+                    </div>
+                </div>
+            `
+					)
+					.join("");
 			}
-			window.onload = function () {
-				generateSequence();
+			function calculateWhiteKeyIntervalString(note1, note2) {
+				const [pitch1, octave1] = note1.split("/");
+				const [pitch2, octave2] = note2.split("/");
+				const index1 = allNotes.indexOf(pitch1);
+				const index2 = allNotes.indexOf(pitch2);
+
+				// Calculate correct interval
+				let interval = (index2 - index1 + 7) % 7;
+				if (interval > 3) interval -= 7;
+
+				const intervalNames = [
+					"unison",
+					"second",
+					"third",
+					"fourth",
+					"fifth",
+					"sixth",
+					"seventh",
+				];
+
+				function formatInterval(interval) {
+					if (interval === 0) return "unison";
+					const direction = interval > 0 ? "up" : "down";
+					const absInterval = Math.abs(interval);
+					const intervalName = intervalNames[absInterval];
+					return `${direction} a ${intervalName}`;
+				}
+
+				// Calculate the negated interval
+				let negatedInterval;
+				if (interval > 0) {
+					negatedInterval = interval - 7;
+				} else if (interval < 0) {
+					negatedInterval = interval + 7;
+				} else {
+					negatedInterval = 0; // For unison
+				}
+
+				return {
+					correct: formatInterval(interval),
+					negated: formatInterval(negatedInterval),
+				};
+			}
+			function saveSettings() {
+				const settings = {
+					startingNote: document.getElementById("startingNote").value,
+					trackingLine: document.getElementById("trackingLine").value,
+					noteCount: document.getElementById("noteCount").value,
+				};
+				localStorage.setItem(
+					"sightReadingSettings",
+					JSON.stringify(settings)
+				);
+			}
+
+			function loadSettings() {
+				const settings = JSON.parse(
+					localStorage.getItem("sightReadingSettings")
+				);
+				if (settings) {
+					document.getElementById("startingNote").value =
+						settings.startingNote;
+					document.getElementById("trackingLine").value =
+						settings.trackingLine;
+					document.getElementById("noteCount").value =
+						settings.noteCount || 16;
+				}
+			}
+
+			function updateHistoryDisplay() {
+				const history =
+					JSON.parse(localStorage.getItem("sightReadingHistory")) ||
+					[];
+				const tableBody = document.getElementById("historyTableBody");
+				tableBody.innerHTML = "";
+				history.forEach((entry) => {
+					const row = tableBody.insertRow();
+					row.innerHTML = `
+						<td class="py-2 px-4 border-b">${entry.date}</td>
+						<td class="py-2 px-4 border-b">${entry.sequence.join(", ")}</td>
+						<td class="py-2 px-4 border-b">${entry.trackingLine}</td>
+						<td class="py-2 px-4 border-b">${entry.noteCount}</td>
+					`;
+				});
+			}
+
+			function saveHistory(sequence) {
+				const history =
+					JSON.parse(localStorage.getItem("sightReadingHistory")) ||
+					[];
+				const entry = {
+					date: new Date().toLocaleString(),
+					sequence: sequence,
+					trackingLine: document.getElementById("trackingLine").value,
+					noteCount: document.getElementById("noteCount").value,
+				};
+				history.unshift(entry);
+				if (history.length > 50) history.pop();
+				localStorage.setItem(
+					"sightReadingHistory",
+					JSON.stringify(history)
+				);
+				updateHistoryDisplay();
+			}
+
+			function showTab(tabName) {
+				[
+					"practiceSection",
+					"settingsSection",
+					"historySection",
+				].forEach((section) => {
+					document.getElementById(section).classList.add("hidden");
+				});
+				["practiceTab", "settingsTab", "historyTab"].forEach((tab) => {
+					document
+						.getElementById(tab)
+						.classList.remove("bg-blue-500", "text-white");
+					document
+						.getElementById(tab)
+						.classList.add("bg-gray-300", "text-gray-700");
+				});
+
 				document
-					.getElementById("prevNote")
-					.addEventListener("click", () => updateNote(-1));
+					.getElementById(`${tabName}Section`)
+					.classList.remove("hidden");
 				document
-					.getElementById("nextNote")
-					.addEventListener("click", () => updateNote(1));
+					.getElementById(`${tabName}Tab`)
+					.classList.add("bg-blue-500", "text-white");
 				document
-					.getElementById("generateSequence")
-					.addEventListener("click", generateSequence);
+					.getElementById(`${tabName}Tab`)
+					.classList.remove("bg-gray-300", "text-gray-700");
+
+				if (tabName === "history") {
+					updateHistoryDisplay();
+				}
+			}
+
+			// Event listeners
+			document
+				.getElementById("practiceTab")
+				.addEventListener("click", () => showTab("practice"));
+			document
+				.getElementById("settingsTab")
+				.addEventListener("click", () => showTab("settings"));
+			document
+				.getElementById("historyTab")
+				.addEventListener("click", () => showTab("history"));
+			document
+				.getElementById("generateSequence")
+				.addEventListener("click", generateSequence);
+			document
+				.getElementById("prevNote")
+				.addEventListener("click", () => updateNote(-1));
+			document
+				.getElementById("nextNote")
+				.addEventListener("click", () => updateNote(1));
+
+			// Settings change listeners
+			["startingNote", "trackingLine", "noteCount"].forEach((setting) => {
 				document
-					.getElementById("exerciseType")
-					.addEventListener("change", updateExerciseInfo);
-				document
-					.getElementById("startingNote")
-					.addEventListener("change", generateSequence);
-				document
-					.getElementById("trackingLine")
-					.addEventListener("change", generateSequence);
-			};
+					.getElementById(setting)
+					.addEventListener("change", saveSettings);
+			});
+
+			// Initialize the app
+			loadSettings();
+			showTab("practice");
+			generateSequence();
 		</script>
 	</body>
 </html>
