@@ -230,9 +230,26 @@
 						currentOctave +
 						Math.floor((currentIndex + intervalChange) / 7);
 
+					let sudoNewOctave = // this weird logic prevents the note from going out of the range C4 to B5
+						currentOctave +
+						Math.floor(
+							(currentIndex +
+								intervalChange +
+								(intervalChange > 0 ? 1 : 0)) /
+								7
+						);
+
 					// Ensure the note is within a reasonable range (C4 to B5)
-					if (newOctave < 4) newOctave = 4;
-					if (newOctave > 5) newOctave = 5;
+					if (sudoNewOctave < 4) {
+						intervalChange *= -1;
+					}
+					if (sudoNewOctave > 5) {
+						intervalChange *= -1;
+					}
+					newIndex = (currentIndex + intervalChange + 7) % 7;
+					newOctave =
+						currentOctave +
+						Math.floor((currentIndex + intervalChange) / 7);
 
 					currentIndex = newIndex;
 					currentOctave = newOctave;
@@ -439,13 +456,13 @@
 				intervalInfo.innerHTML = infoItems
 					.map(
 						(item) => `
-                <div class="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 p-2">
-                    <div class="bg-gray-200 rounded-lg p-2 text-center">
-                        <div class="font-semibold">${item.label}</div>
-                        <div class="mt-1">${item.value}</div>
-                    </div>
-                </div>
-            `
+			             <div class="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 p-2">
+			                 <div class="bg-gray-200 rounded-lg p-2 text-center">
+			                     <div class="font-semibold">${item.label}</div>
+			                     <div class="mt-1">${item.value}</div>
+			                 </div>
+			             </div>
+			         `
 					)
 					.join("");
 			}
