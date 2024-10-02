@@ -278,7 +278,10 @@
 				const context = renderer.getContext();
 
 				const stave = new VF.Stave(10, 40, container.clientWidth - 20);
-				stave.addClef("treble").setContext(context).draw();
+				stave
+					// .addClef("treble")
+					.setContext(context)
+					.draw();
 
 				const notes = notesSequence.map((note, index) => {
 					const [pitch, octave] = note.split("/");
