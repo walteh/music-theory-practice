@@ -59,11 +59,8 @@
 							id="notationContainer"
 							class="w-full h-80 mb-4"
 						></div>
-						<div
-							id="intervalInfo"
-							class="mb-4 flex flex-wrap justify-between text-sm -mt-40 z-10"
-						></div>
-						<div class="flex justify-between mb-4">
+
+						<div class="flex justify-between mb-4 -mt-40 z-10">
 							<button
 								id="prevNote"
 								class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -77,14 +74,19 @@
 								Next Note
 							</button>
 						</div>
+					</div>
+					<div
+						id="intervalInfo"
+						class="mb-4 flex flex-wrap justify-between text-sm"
+					></div>
+					<div class="justify-center flex">
 						<button
 							id="generateSequence"
-							class="w-full bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition duration-300 mt-6"
+							class="bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition duration-300 mt-6"
 						>
-							Generate Sequence
+							Generate New Sequence
 						</button>
 					</div>
-
 					<div id="settingsSection" class="hidden">
 						<h2
 							class="text-2xl font-bold mb-6 text-center text-gray-800"
