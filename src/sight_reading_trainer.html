@@ -74,19 +74,20 @@
 								Next Note
 							</button>
 						</div>
+						<div
+							id="intervalInfo"
+							class="mb-4 flex flex-wrap justify-between text-sm"
+						></div>
+						<div class="justify-center flex">
+							<button
+								id="generateSequence"
+								class="bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition duration-300 mt-6"
+							>
+								Generate New Sequence
+							</button>
+						</div>
 					</div>
-					<div
-						id="intervalInfo"
-						class="mb-4 flex flex-wrap justify-between text-sm"
-					></div>
-					<div class="justify-center flex">
-						<button
-							id="generateSequence"
-							class="bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition duration-300 mt-6"
-						>
-							Generate New Sequence
-						</button>
-					</div>
+
 					<div id="settingsSection" class="hidden">
 						<h2
 							class="text-2xl font-bold mb-6 text-center text-gray-800"
@@ -103,13 +104,15 @@
 								id="startingNote"
 								class="w-full p-3 border rounded-lg shadow-sm"
 							>
+								<option value="B/4">
+									Si (B) - treble clef
+								</option>
 								<option value="C/4">Do (C)</option>
 								<option value="D/4">Re (D)</option>
 								<option value="E/4">Mi (E)</option>
 								<option value="F/4">Fa (F)</option>
 								<option value="G/4">Sol (G)</option>
 								<option value="A/4">La (A)</option>
-								<option value="B/4">Si (B)</option>
 							</select>
 						</div>
 						<div class="mb-6">
