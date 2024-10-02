@@ -101,10 +101,6 @@
 							class="text-6xl font-bold text-center mb-6 text-purple-600"
 						></div>
 						<div
-							id="currentStepSub"
-							class="text-2xl font-bold text-center mb-6 text-purple-300"
-						></div>
-						<div
 							id="endNote"
 							class="text-2xl font-bold text-center mb-4 text-red-600 hidden"
 						></div>
@@ -289,7 +285,6 @@
 			const sequenceDisplay = document.getElementById("sequenceDisplay");
 			const startNoteDisplay = document.getElementById("startNote");
 			const currentStep = document.getElementById("currentStep");
-			const currentStepSub = document.getElementById("currentStepSub");
 			const endNoteDisplay = document.getElementById("endNote");
 			const pathFollowedDisplay = document.getElementById("pathFollowed");
 			const nextBtn = document.getElementById("next");
@@ -357,8 +352,8 @@
 				startNote = notes[Math.floor(Math.random() * notes.length)];
 				[endNote, path] = calculateEndNoteAndPath(startNote, sequence);
 				updateStepDisplay();
-				startNoteDisplay.textContent = `Start: ${startNote}`;
-				endNoteDisplay.textContent = `End: ${endNote}`;
+				startNoteDisplay.innerHTML = `Start: <span class="inline-block px-2 py-1 m-1 bg-gray-200 rounded-full font-bold text-black text-xl">${startNote}</span>`;
+				endNoteDisplay.innerHTML = `End: <span class="inline-block px-2 py-1 m-1 bg-gray-200 rounded-full font-bold text-black text-xl">${endNote}</span>`;
 				endNoteDisplay.classList.add("hidden");
 				pathFollowedDisplay.classList.add("hidden");
 				resultInput.classList.add("hidden");
@@ -381,10 +376,8 @@
 				currentIndex++;
 				updateDisplay();
 				currentStep.classList.add("pulse");
-				currentStepSub.classList.add("pulse");
 
 				setTimeout(() => currentStep.classList.remove("pulse"), 500);
-				setTimeout(() => currentStepSub.classList.remove("pulse"), 500);
 			}
 
 			function calculateEndNoteAndPath(start, steps) {
@@ -393,6 +386,11 @@
 				const path = [{ note: start, step: 0 }];
 				steps.forEach((step) => {
 					index = (index + step + 7) % 7;
+					if (step < 0) index += 1;
+					else index -= 1;
+					if (index < 0) index = notes.length - 1;
+					if (index >= notes.length) index = 0;
+					console.log({ index, step, note: notes[index], notes });
 					path.push({ note: notes[index], step: step });
 				});
 				return [notes[index], path];
@@ -403,36 +401,12 @@
 					const step = sequence[currentIndex];
 					let stepText;
 
-					const intervalNames = [
-						"unison",
-						"second",
-						"third",
-						"fourth",
-						"fifth",
-						"sixth",
-						"seventh",
-					];
-
-					const intervalIndex = Math.abs(step) - 1;
-					if (
-						intervalIndex >= 0 &&
-						intervalIndex < intervalNames.length
-					) {
-						const direction = step > 0 ? "up" : "down";
-						stepText = `${direction} a ${intervalNames[intervalIndex]}`;
-					} else {
-						stepText =
-							step > 0 ? `up ${step}` : `down ${Math.abs(step)}`;
-					}
-
-					currentStepSub.textContent = `(${stepText})`;
 					progress.textContent = `${currentIndex + 1} / ${
 						sequence.length
 					}`;
-					currentStep.textContent = `${step > 0 ? "+" : ""}${step}`;
+					currentStep.textContent = convertStepToInterval(step);
 				} else {
 					currentStep.textContent = "Done!";
-					currentStepSub.textContent = "";
 					nextBtn.disabled = true;
 					nextBtn.classList.add("hidden");
 					progress.textContent = `${sequence.length} / ${sequence.length}`;
@@ -440,20 +414,43 @@
 				}
 			}
 
+			function convertStepToInterval(step) {
+				const intervalNames = [
+					"unison",
+					"second",
+					"third",
+					"fourth",
+					"fifth",
+					"sixth",
+					"seventh",
+				];
+				const intervalIndex = Math.abs(step) - 1;
+				if (
+					intervalIndex >= 0 &&
+					intervalIndex < intervalNames.length
+				) {
+					return step > 0
+						? `⬆️ a ${intervalNames[intervalIndex]}`
+						: `⬇️ a ${intervalNames[intervalIndex]}`;
+				} else {
+					return step > 0 ? `⬆️ ${step}` : `⬇️ ${Math.abs(step)}`;
+				}
+			}
+
 			function showResult() {
 				endNoteDisplay.classList.remove("hidden");
-				endNoteDisplay.innerHTML = `End: <span class="text-4xl font-bold text-red-600">${endNote}</span>`;
+				endNoteDisplay.innerHTML = `End: <span class="inline-block px-2 py-1 m-1 bg-gray-200 rounded-full font-bold pulse text-black text-xl">${endNote}</span>`;
 				pathFollowedDisplay.innerHTML = `Path: ${path
 					.map(
 						(step, index) =>
-							`<span class="inline-block px-2 py-1 m-1 bg-gray-200 rounded-full">${
-								step.note
-							}${
+							`${
 								index > 0
-									? ` <span class="text-sm text-gray-600">(${
-											step.step > 0 ? "+" : ""
-									  }${step.step})</span>`
+									? `<span class="inline-block px-2 py-1 m-1 bg-gray-200 rounded-full text-xs">${convertStepToInterval(
+											step.step
+									  )}</span> → `
 									: ""
+							}<span class="inline-block px-2 py-1 m-1 bg-gray-200 rounded-full font-bold">${
+								step.note
 							}</span>`
 					)
 					.join(" → ")}`;
@@ -501,10 +498,12 @@
 
 			function generateWhiteKeySequence(count) {
 				return Array.from({ length: count }, () => {
+					// Generate a random number between -7 and 7, excluding 0 and -1 and 1
 					let step;
 					do {
-						step = Math.floor(Math.random() * 7) - 3; // -3 to 3
-					} while (step === 0);
+						step = Math.floor(Math.random() * 7) + 1;
+						step *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
+					} while (step === 0 || step === -1 || step === 1);
 					return step;
 				});
 			}
@@ -614,16 +613,16 @@
 						result.intervalTimes.length;
 					const row = tableBody.insertRow();
 					row.innerHTML = `
-                    <td class="py-2 px-4 border-b">${result.date}</td>
-                    <td class="py-2 px-4 border-b">${result.stepCount}</td>
-                    <td class="py-2 px-4 border-b">${result.totalTime.toFixed(
-						1
-					)}s</td>
-                    <td class="py-2 px-4 border-b">${avgIntervalTime.toFixed(
-						1
-					)}s</td>
-                    <td class="py-2 px-4 border-b">${mistakesText}</td>
-                `;
+			                 <td class="py-2 px-4 border-b">${result.date}</td>
+			                 <td class="py-2 px-4 border-b">${result.stepCount}</td>
+			                 <td class="py-2 px-4 border-b">${result.totalTime.toFixed(
+									1
+								)}s</td>
+			                 <td class="py-2 px-4 border-b">${avgIntervalTime.toFixed(
+									1
+								)}s</td>
+			                 <td class="py-2 px-4 border-b">${mistakesText}</td>
+			             `;
 				});
 			}
 
